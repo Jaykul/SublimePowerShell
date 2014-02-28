@@ -1,7 +1,9 @@
 include Support\*.sublime-*
+include Support\*.py
 include Support\*.tmLanguage
 include Support\*.tmPreferences
 include LICENSE.txt
+include README.md
 
 exclude *.sublime-project
 exclude *.sublime-workspace
