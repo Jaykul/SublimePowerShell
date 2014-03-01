@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-PACKAGE_VERSION = "28.02.2014"
+PACKAGE_VERSION = "3.1.0-pre-1"
 
 """Commands to build and manage .sublime-package archives with distutils."""
 
@@ -92,6 +92,7 @@ def show_formats ():
     pretty_printer = FancyGetopt(formats)
     pretty_printer.print_help(
         "List of available source distribution formats:")
+
 
 class spa (Command):
 
@@ -546,8 +547,6 @@ class spa (Command):
         """
         return self.archive_files
 
-# class spa
-
 
 class install(Command):
     """Does it make sense?"""
@@ -578,8 +577,6 @@ class test(Command):
     def run(self):
         if os.name == 'nt':
             subprocess.call(["py.test.exe"])
-
-
 
 setup(cmdclass={'spa': spa, 'install': install, 'test': test},
       name='PowerShell',

@@ -2,7 +2,7 @@
 ---
 name: PowerShell
 scopeName: source.powershell
-fileTypes: [ps1, psm1, psd1]
+fileTypes: [ps1, psm1, psd1, pssc]
 uuid: f8f5ffb0-503e-11df-9879-0800200c9a66
 
 patterns:

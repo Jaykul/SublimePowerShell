@@ -1,5 +1,6 @@
 *.pyc
 *.cache
 *.sublime-project
+*.sublime-workspace
 dist/
 MANIFEST

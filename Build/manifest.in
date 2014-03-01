@@ -1,0 +1,9 @@
+include ..\*.sublime-*
+include ..\*.py
+include ..\*.tmLanguage
+include ..\*.tmPreferences
+include ..\LICENSE.txt
+include ..\README.md
+
+exclude *.sublime-project
+exclude *.sublime-workspace
