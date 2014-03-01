@@ -1,8 +1,22 @@
-import sublime, sublime_plugin, subprocess
+import sublime, sublime_plugin
+import winreg, subprocess
+from os import path
 
-# TODO: can we find ConEmu from App Paths?
-# E.g. 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\ConEmu.exe' plus a little tweak...
-CONEMU = "C:\Program Files\Tools\ConEmu\ConEmu\ConEmuC64.exe"
+CONEMU = "C:\\Program Files\\ConEmu\\ConEmuC64.exe"
+try:  # can we find ConEmu from App Paths?
+   apps = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths")
+
+   subkeys, nill, nill = winreg.QueryInfoKey(apps)
+   for k in range(subkeys):
+      app = winreg.EnumKey(apps, k)
+      if app.startswith("ConEmu"):
+         dirName, fileName = path.split(winreg.QueryValue(apps, app))
+         filePath = path.join(dirName,"ConEmu",fileName.replace('ConEmu','ConEmuC'))
+         if path.exists(filePath):
+            CONEMU = filePath
+            break
+finally:
+   winreg.CloseKey(apps)
 
 # TODO: bundle Expand-Alias with functions to save it to disk and/or send it to sublime
 # TODO: cmder style bundle including ConEmu, Sublime, PSReadLine and these macros
