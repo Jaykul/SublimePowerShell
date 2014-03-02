@@ -2,18 +2,23 @@ import sublime, sublime_plugin
 import winreg, subprocess
 from os import path
 
-CONEMU = "C:\\Program Files\\ConEmu\\ConEmuC64.exe"
+CONEMU  = "C:\\Program Files\\ConEmu\\ConEmu64.exe"
+CONEMUC = "C:\\Program Files\\ConEmu\\ConEmu\\ConEmuC64.exe"
+
 try:  # can we find ConEmu from App Paths?
    apps = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths")
-
    subkeys, nill, nill = winreg.QueryInfoKey(apps)
    for k in range(subkeys):
       app = winreg.EnumKey(apps, k)
       if app.startswith("ConEmu"):
-         dirName, fileName = path.split(winreg.QueryValue(apps, app))
+         cemu = winreg.QueryValue(apps, app)
+         if path.exists(cemu):
+            CONEMU = cemu
+
+         dirName, fileName = path.split(cemu)
          filePath = path.join(dirName,"ConEmu",fileName.replace('ConEmu','ConEmuC'))
          if path.exists(filePath):
-            CONEMU = filePath
+            CONEMUC = filePath
             break
 finally:
    winreg.CloseKey(apps)
@@ -24,6 +29,11 @@ finally:
 si = subprocess.STARTUPINFO() 
 si.dwFlags = subprocess.STARTF_USESHOWWINDOW
 si.wShowWindow = subprocess.SW_HIDE
+
+### For best results, we use PSReadLine and rely on it's hotkeys:
+### We need KillLine and Yank set so we can copy/paste any existing command
+#   Set-PSReadlineKeyHandler Ctrl+k KillLine
+#   Set-PSReadlineKeyHandler Ctrl+i Yank
 
 
 # { "keys": ["f5"], "command": "conemu_script" }
@@ -38,7 +48,12 @@ class ConemuScriptCommand(sublime_plugin.TextCommand):
       else:
          script = self.view.substr(sublime.Region(0, self.view.size()))
 
-      subprocess.call([CONEMU, "-GUIMACRO:0", "PASTE", "2", script + "\n"], startupinfo=si)
+      # Use PSReadline KillLine hotkey
+      subprocess.call([CONEMUC, "-GUIMACRO:0", "KEYS", "Home", "^k"], startupinfo=si)
+      subprocess.call([CONEMUC, "-GUIMACRO:0", "PASTE", "2", script + "\n"], startupinfo=si)
+      # Use PSReadline Yank hotkey
+      subprocess.call([CONEMUC, "-GUIMACRO:0", "KEYS", "End", "^i"], startupinfo=si)
+      subprocess.call([CONEMU, "-SHOWHIDE"], startupinfo=si)
 
 # { "keys": ["f8"], "command": "conemu_selection" }
 class ConemuSelectionCommand(sublime_plugin.TextCommand):
@@ -53,5 +68,10 @@ class ConemuSelectionCommand(sublime_plugin.TextCommand):
          else:
             script += [self.view.substr(region)]
 
-      subprocess.call([CONEMU, "-GUIMACRO:0", "PASTE", "2", "\n".join(script) + "\n"], startupinfo=si)
+      # Use PSReadline KillLine hotkey
+      subprocess.call([CONEMUC, "-GUIMACRO:0", "KEYS", "Home", "^k"], startupinfo=si)
+      subprocess.call([CONEMUC, "-GUIMACRO:0", "PASTE", "2", "\n".join(script) + "\n"], startupinfo=si)
+      # Use PSReadline Yank hotkey
+      subprocess.call([CONEMUC, "-GUIMACRO:0", "KEYS", "End", "^i"], startupinfo=si)
+      subprocess.call([CONEMU, "-SHOWHIDE"], startupinfo=si)
 
